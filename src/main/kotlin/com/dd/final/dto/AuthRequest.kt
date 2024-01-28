@@ -1,6 +1,5 @@
 package com.dd.final.dto
 
-import com.dd.final.model.Role
 import javax.validation.constraints.Size
 
 data class AuthRequest(

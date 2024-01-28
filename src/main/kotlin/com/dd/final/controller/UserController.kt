@@ -5,7 +5,7 @@ import com.dd.final.dto.AuthRequest
 import com.dd.final.dto.MessageResponse
 import com.dd.final.security.error.BadRequestException
 import com.dd.final.security.error.ValidationErrorProcessor
-import com.dd.final.service.UserService
+import com.dd.final.service.CustomUserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.BadCredentialsException
@@ -18,13 +18,13 @@ import javax.validation.Valid
 
 @RestController
 class UserController(
-    private val userService: UserService,
+    private val customUserService: CustomUserService,
     private val validationErrorProcessor: ValidationErrorProcessor
 ) {
     @PostMapping("/login")
     fun login(@Valid @RequestBody authRequest: AuthRequest): ResponseEntity<Any> {
         return try {
-            userService.login(authRequest)
+            customUserService.login(authRequest)
         } catch (e: Exception) {
             val status = when (e) {
                 is UsernameNotFoundException -> HttpStatus.BAD_REQUEST
@@ -43,7 +43,7 @@ class UserController(
             return ResponseEntity.badRequest().body(MessageResponse(errorMessage))
         }
         return try {
-            userService.register(addUserRequest)
+            customUserService.register(addUserRequest)
         } catch (e: BadRequestException) {
             return ResponseEntity.badRequest().body(MessageResponse(e.message))
         }

@@ -20,7 +20,6 @@ class JwtUtils {
     @Value("\${app.jwtExpirationMs}")
     var jwtExpirationMs :Int?=null
 
-
     fun generateJwtToken(authentication: Authentication): String {
         val userPrincipal: UserDetailImpl = authentication.principal as UserDetailImpl
         val keyBytes = Decoders.BASE64.decode(jwtSecret)

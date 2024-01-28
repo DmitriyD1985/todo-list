@@ -2,7 +2,8 @@ package com.dd.final.security.config
 
 import com.dd.final.security.jwt.AuthEntryPointJwt
 import com.dd.final.security.jwt.AuthTokenFilter
-import com.dd.final.service.UserService
+import com.dd.final.security.jwt.JwtUtils
+import com.dd.final.service.CustomUserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -18,9 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfiguration(
-    private val userDetailsService: UserService,
+    private val userDetailsService: CustomUserService,
+    private val jwtUtils: JwtUtils,
     private val unauthorizedHandler: AuthEntryPointJwt
 ) : WebSecurityConfigurerAdapter() {
 
@@ -28,7 +29,7 @@ class SecurityConfiguration(
     fun passwordEncoder() = BCryptPasswordEncoder()
     @Bean
     fun authenticationJwtTokenFilter(): AuthTokenFilter? {
-        return AuthTokenFilter()
+        return AuthTokenFilter(jwtUtils, userDetailsService)
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {

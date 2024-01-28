@@ -1,6 +1,7 @@
 package com.dd.final.service
 
 import com.dd.final.dto.AddTaskRequest
+import com.dd.final.dto.UpdateTaskRequest
 import com.dd.final.model.Role
 import com.dd.final.model.Task
 import com.dd.final.model.User
@@ -9,6 +10,7 @@ import com.dd.final.repository.UserRepository
 import com.dd.final.security.UserDetailImpl
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -34,7 +36,6 @@ class TaskServiceTest {
 
         every { taskRepository.save(any()) } returns newTask
         every { userRepository.findByUsername(userDetails.username) } returns user
-
         every { userRepository.save(user)} returns user
 
         val result = taskService.addTask(addTaskRequest)
@@ -43,14 +44,52 @@ class TaskServiceTest {
 
     @Test
     fun getTasks() {
+        val user = User(username = "user", password = "password", roles = hashSetOf(Role.ROLE_USER))
+        val userDetails = UserDetailImpl(user) as UserDetails
+
+        val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+        SecurityContextHolder.getContext().authentication = authentication
+
+        every { userRepository.findByUsername(userDetails.username) } returns user
+        every { userRepository.save(user)} returns user
+
+        val result = taskService.getTasks().body as List<*>
+
+        assert(user.task.size == result.size)
     }
 
     @Test
     fun updateTask() {
+        val user = User(username = "user", password = "password", roles = hashSetOf(Role.ROLE_ADMIN))
+        val userDetails = UserDetailImpl(user) as UserDetails
+        val updateTask = UpdateTaskRequest(1, description = "some new description", true)
+        val task = updateTask.toDto()
+
+        val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+        SecurityContextHolder.getContext().authentication = authentication
+
+        every { userRepository.findByUsername(userDetails.username) } returns user
+        every { taskRepository.save(any())} returns task
+
+        val result = taskService.updateTask(updateTask)
+
+        assert(result.body?.description == task.description)
     }
 
     @Test
     fun deleteTask() {
+        val user = User(username = "user", password = "password", roles = hashSetOf(Role.ROLE_ADMIN))
+        val userDetails = UserDetailImpl(user) as UserDetails
+        val taskId = 1L
 
+        val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+        SecurityContextHolder.getContext().authentication = authentication
+
+        every { userRepository.findByUsername(userDetails.username) } returns user
+        every { taskRepository.deleteById(taskId)} returns Unit
+
+        val result = taskService.deleteTask(taskId)
+
+        verify(exactly = 1) { taskRepository.deleteById(taskId) }
     }
 }

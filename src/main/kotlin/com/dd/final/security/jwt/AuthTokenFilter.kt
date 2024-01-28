@@ -1,6 +1,6 @@
 package com.dd.final.security.jwt
 
-import com.dd.final.service.UserService
+import com.dd.final.service.CustomUserService
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -14,13 +14,10 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class AuthTokenFilter : OncePerRequestFilter() {
-    @Autowired
-    lateinit var jwtUtils: JwtUtils
-
-    @Autowired
-    lateinit var userDetailsService: UserService
-
+class AuthTokenFilter(
+    private val jwtUtils: JwtUtils,
+    private val userDetailsService: CustomUserService
+) : OncePerRequestFilter() {
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
         request: HttpServletRequest,

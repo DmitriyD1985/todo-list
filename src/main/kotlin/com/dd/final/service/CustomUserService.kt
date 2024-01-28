@@ -9,7 +9,6 @@ import com.dd.final.dto.AuthRequest
 import com.dd.final.dto.LoginResponse
 import com.dd.final.repository.UserRepository
 import com.dd.final.security.UserDetailImpl
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -24,15 +23,12 @@ import java.util.stream.Collectors
 
 
 @Service
-class UserService: UserDetailsService {
-    @Autowired
-    lateinit var userRepository: UserRepository
-    @Autowired
-    lateinit var passwordEncoder: BCryptPasswordEncoder
-    @Autowired
-    lateinit var authenticationManager: AuthenticationManager
-    @Autowired
-    lateinit var jwtUtils: JwtUtils
+class CustomUserService(
+    private val userRepository: UserRepository,
+    private val passwordEncoder: BCryptPasswordEncoder,
+    private val authenticationManager: AuthenticationManager,
+    private val jwtUtils: JwtUtils
+) : UserDetailsService {
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String?): UserDetails {

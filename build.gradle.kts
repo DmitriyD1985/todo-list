@@ -30,11 +30,11 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "junit", module = "junit")
-    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.9.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
+    testImplementation("org.springframework.security:spring-security-test:5.4.2")
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks.withType<KotlinCompile> {

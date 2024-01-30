@@ -1,12 +1,13 @@
 package com.dd.final.util
 
+import com.dd.final.dto.AddUserRequest
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 
 object JsonParser {
     @Throws(JsonProcessingException::class)
-    fun <T> toJson(objectMapper: ObjectMapper, `object`: T): String {
+    fun toJson(objectMapper: ObjectMapper, `object`: AddUserRequest): String {
         return objectMapper.writeValueAsString(`object`)
     }
 

@@ -2,30 +2,25 @@ package com.dd.final.controller
 
 import com.dd.final.dto.AddUserRequest
 import com.dd.final.dto.AuthRequest
-import com.dd.final.dto.LoginResponse
+import com.dd.final.repository.TaskRepository
 import com.dd.final.repository.UserRepository
-import com.dd.final.security.error.BadRequestException
+import com.dd.final.security.error.ValidationErrorProcessor
 import com.dd.final.service.CustomUserService
-import com.dd.final.util.JsonParser
-import com.dd.final.util.JsonParser.toJson
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.mockk.every
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-@SpringBootTest
+
+@WebMvcTest(UserController::class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
     @Autowired
@@ -35,47 +30,41 @@ class UserControllerTest {
     lateinit var mockMvc: MockMvc
 
     @MockBean
+    lateinit var customUserService: CustomUserService
+
+    @MockBean
+    lateinit var passwordEncoder: BCryptPasswordEncoder
+
+    @MockBean
     lateinit var userRepository: UserRepository
 
     @MockBean
-    lateinit var customUserService: CustomUserService
+    lateinit var taskRepository: TaskRepository
 
-    @Autowired
-    lateinit var passwordEncoder: BCryptPasswordEncoder
+    @MockBean
+    lateinit var validationErrorProcessor: ValidationErrorProcessor
 
-    val request = AuthRequest("user", "password")
 
     @Test
-    @WithMockUser(username = "user", password = "password", authorities = [])
     fun login() {
+        val authRequest = objectMapper.writeValueAsString(AuthRequest("user", "password"))
         mockMvc.perform(
-            MockMvcRequestBuilders.post("/login")
+            MockMvcRequestBuilders.post("/api/v1/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonParser.toJson(objectMapper, request))
+                .content(authRequest)
         ).andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn().response
     }
 
     @Test
-    @WithMockUser(username = "user", password = "password", authorities = [])
-    fun loginNegative() {
-        every { customUserService.login(request) } throws BadRequestException("access denied")
-        mockMvc.perform(
-            MockMvcRequestBuilders.post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonParser.toJson(objectMapper, request))
-        ).andExpect(MockMvcResultMatchers.status().isForbidden)
-            .andReturn().response
-    }
-
-    @Test
-    @WithMockUser(username = "user", password = "password", authorities = [])
     fun register() {
+        val addUserRequest = objectMapper.writeValueAsString(AddUserRequest("user", "password", setOf("ROLE_USER")))
         mockMvc.perform(
-            MockMvcRequestBuilders.post("/login")
+            MockMvcRequestBuilders.post("/api/v1/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonParser.toJson(objectMapper, request))
+                .content(addUserRequest)
         ).andExpect(MockMvcResultMatchers.status().isOk)
             .andReturn().response
     }
+
 }

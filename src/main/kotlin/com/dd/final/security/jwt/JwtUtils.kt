@@ -21,7 +21,7 @@ class JwtUtils {
     var jwtExpirationMs :Int?=null
 
     fun generateJwtToken(authentication: Authentication): String {
-        val userPrincipal: UserDetailImpl = authentication.principal as UserDetailImpl
+        val userPrincipal = authentication.principal as UserDetailImpl
         val keyBytes = Decoders.BASE64.decode(jwtSecret)
         val key: Key = Keys.hmacShaKeyFor(keyBytes)
         val token = Jwts.builder()

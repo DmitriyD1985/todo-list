@@ -1,11 +1,13 @@
 package com.dd.final.security.config
 
+import com.dd.*
 import com.dd.final.security.jwt.AuthEntryPointJwt
 import com.dd.final.security.jwt.AuthTokenFilter
 import com.dd.final.security.jwt.JwtUtils
 import com.dd.final.service.CustomUserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -14,15 +16,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfiguration(
-    private val userDetailsService: CustomUserService,
-    private val jwtUtils: JwtUtils,
-    private val unauthorizedHandler: AuthEntryPointJwt
+    @Lazy private val userDetailsService: CustomUserService,
+    @Lazy private val jwtUtils: JwtUtils,
+    @Lazy private val unauthorizedHandler: AuthEntryPointJwt,
 ) : WebSecurityConfigurerAdapter() {
 
     @Bean
@@ -49,6 +53,6 @@ class SecurityConfiguration(
             .authenticated()
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter::class.java)
-
     }
 }
+

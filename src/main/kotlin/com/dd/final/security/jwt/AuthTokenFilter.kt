@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 import javax.servlet.FilterChain
+import javax.servlet.RequestDispatcher
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -36,9 +37,12 @@ class AuthTokenFilter(
                 SecurityContextHolder.getContext().authentication = authentication
             }
         } catch (e: Exception) {
+            response.sendError(403, "poka")
             LOG.error("Can't auth user")
         }
-        filterChain.doFilter(request, response)
+
+           filterChain.doFilter(request, response)
+
     }
 
     private fun parseJwt(request: HttpServletRequest): String? {

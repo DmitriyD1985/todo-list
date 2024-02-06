@@ -15,8 +15,8 @@ class UserDetailImpl(val user: User) : UserDetails {
         return user.id
     }
 
-    fun getTask(): List<Task?> {
-        return user.task
+    fun getTask(): MutableList<Task?> {
+        return user.tasks
     }
 
     override fun getPassword(): String {

@@ -26,8 +26,7 @@ data class User(
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "task_id")
-    @JsonIgnore
-    var task: List<Task> = emptyList(),
+    var tasks: MutableList<Task?> = arrayListOf(),
 
     @Fetch(FetchMode.JOIN)
     @Column var roles: HashSet<Role> = HashSet()

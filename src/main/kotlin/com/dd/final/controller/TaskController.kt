@@ -16,7 +16,7 @@ import javax.validation.Valid
 @RequestMapping("/api/v1/task")
 class TaskController(private var taskService: TaskService) {
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PostMapping("/add")
     fun add(@Valid @RequestBody addTaskRequest: AddTaskRequest): ResponseEntity<*> = try {
         taskService.addTask(addTaskRequest)
@@ -26,7 +26,7 @@ class TaskController(private var taskService: TaskService) {
             .body(MessageResponse(e.message))
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/get")
     fun get(): ResponseEntity<*> = try {
         taskService.getTasks()
@@ -43,7 +43,7 @@ class TaskController(private var taskService: TaskService) {
     ) = try {
         taskService.updateTask(newTask)
     } catch (e: Exception) {
-        val status = when (e) {
+        when (e) {
             is BadCredentialsException -> HttpStatus.UNAUTHORIZED
             else -> HttpStatus.FORBIDDEN
         }

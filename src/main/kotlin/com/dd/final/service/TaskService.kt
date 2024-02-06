@@ -23,14 +23,16 @@ class TaskService(
         val newTask = Task(
             description = addTaskRequest.description,
         ).apply { taskRepository.save(this) }
-        user.task.plus(newTask)
-        userRepository.save(user)
+        val newUser = user.also{
+            it.tasks.add(newTask)
+        }
+        userRepository.save(newUser)
         return ResponseEntity.ok().body(newTask)
     }
 
     fun getTasks(): ResponseEntity<*> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserDetails
-        val tasks = userRepository.findByUsername(user.username)?.task
+        val tasks = userRepository.findByUsername(user.username)?.tasks
         return ResponseEntity.ok().body(tasks)
     }
 

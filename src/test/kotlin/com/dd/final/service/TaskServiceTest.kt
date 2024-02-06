@@ -55,7 +55,7 @@ class TaskServiceTest {
 
         val result = taskService.getTasks().body as List<*>
 
-        assert(user.task.size == result.size)
+        assert(user.tasks.size == result.size)
     }
 
     @Test
